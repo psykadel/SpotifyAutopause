@@ -34,6 +34,12 @@ This project was created as an alternative to the excellent BackgroundMusic proj
 
 3. Ensure you have the necessary permissions to control Spotify and monitor system audio.
 
+## Installation (Application Option)
+
+1. Download the .dmg file from "Releases."
+
+2. Open the .dmg file, and drag and drop "Spotify Autopause" to your Applications folder.
+
 ## Usage
 
 1. Run the application:
