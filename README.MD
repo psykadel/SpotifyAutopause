@@ -62,7 +62,7 @@ This project was created as an alternative to the excellent BackgroundMusic proj
    pip install pyinstaller
    ```
 
-2. Run ./utilities/build.sh from the root mac-spotify-autopause folder.  A cleanup.sh is also available to clean the build and dist folders up after a build if you choose.
+2. Run ./utilities/build.sh from the root spotify-autopause folder.  A cleanup.sh is also available to clean the build and dist folders up after a build if you choose.
 
 3. A .app will be created in ./dist, which you can then copy to your Applications folder.
 
@@ -79,7 +79,7 @@ To prevent specific applications from triggering Spotify to pause:
 
 ### Adjusting Timers
 
-You can modify the following constants in the `spotify_autopause.py` file to adjust the application's behavior:
+You can modify the following constants in the `spotify-autopause.py` file to adjust the application's behavior:
 
 - `DELAY_WHEN_START`: Initial delay when the application starts monitoring (default: 1 second)
 - `DELAY_WHEN_PLAYING`: Interval between checks when Spotify is playing (default: 1 second)
