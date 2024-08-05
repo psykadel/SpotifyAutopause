@@ -24,7 +24,7 @@ This project was created as an alternative to the excellent BackgroundMusic proj
 
 1. Clone the repository:
    ```
-   git clone https://github.com/psykadel/mac-spotify-autopause.git
+   git clone https://github.com/psykadel/SpotifyAutopause.git
    ```
 
 2. Install the required dependencies:
@@ -44,7 +44,7 @@ This project was created as an alternative to the excellent BackgroundMusic proj
 
 1. Run the application:
    ```
-   python spotify_autopause.py
+   python spotify-autopause.py
    ```
 
 2. The application will appear as an icon in the menu bar.
@@ -57,7 +57,7 @@ This project was created as an alternative to the excellent BackgroundMusic proj
 
 ## Running As Application
 
-1. Install pyinstaller.
+1. Install pyinstaller if not already installed by requirements.txt.
    ```
    pip install pyinstaller
    ```
