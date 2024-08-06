@@ -14,8 +14,8 @@ import json
 SPOTIFY_PLAYER_STATE_SCRIPT = 'tell application "Spotify" to player state'
 SPOTIFY_PAUSE_SCRIPT = 'tell application "Spotify" to pause'
 SPOTIFY_PLAY_SCRIPT = 'tell application "Spotify" to play'
-DELAY_WHEN_START = 1
-DELAY_WHEN_PLAYING = 1
+DELAY_WHEN_START = 2
+DELAY_WHEN_PLAYING = 2
 DELAY_WHEN_NOT_PLAYING = 3
 APP_SUPPORT_DIR = os.path.join(os.path.expanduser('~'), 'Library', 'Application Support', "Spotify Autopause")
 IGNORE_LIST_FILE = os.path.join(APP_SUPPORT_DIR, 'ignore_list.json')
