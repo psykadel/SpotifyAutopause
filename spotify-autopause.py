@@ -1,14 +1,19 @@
-import subprocess
+# Standard library imports
+import os
 import re
+import subprocess
 import time
 from collections import deque
-import os
-import rumps
-from Foundation import NSObject
-from AppKit import NSApplication, NSBundle, NSProcessInfo
-from tabulate import tabulate
-import osascript
+from typing import List, Tuple
+
+# Third-party library imports
 import json
+import objc
+import psutil
+import rumps
+import osascript
+from AppKit import NSApplication, NSBundle, NSProcessInfo # type: ignore
+from tabulate import tabulate
 
 # Constants
 SPOTIFY_PLAYER_STATE_SCRIPT = 'tell application "Spotify" to player state'
@@ -21,9 +26,23 @@ APP_SUPPORT_DIR = os.path.join(os.path.expanduser('~'), 'Library', 'Application 
 IGNORE_LIST_FILE = os.path.join(APP_SUPPORT_DIR, 'ignore_list.json')
 LOG_FILE = os.path.join(APP_SUPPORT_DIR, 'spotify_autopause.log')
 
-class AppDelegate(NSObject):
-    def applicationSupportsSecureRestorableState_(self, app) -> bool:
-        return True
+@objc.typedSelector(b'B@:')
+def application_supports_secure_restorable_state(_) -> bool:
+    """
+    Determine if the application supports secure restorable state.
+    
+    This function is used as a delegate method for NSApplication. It informs
+    the system whether this application supports secure state restoration.
+    
+    Secure state restoration allows the app to safely store and restore its state
+    across launches, which is particularly useful for apps that handle sensitive
+    data or need to maintain their state reliably.
+    
+    By returning True, we're indicating that our app is capable of handling
+    secure state restoration, which may improve the user experience by preserving
+    app state between launches while maintaining security.
+    """
+    return True
 
 class SpotifyAutopause:
     def __init__(self) -> None:
@@ -42,31 +61,31 @@ class SpotifyAutopause:
     # Application Setup
     # -----------------
 
-    def setup_app(self):
+    @staticmethod
+    def hide_dock_icon() -> None:
+        """Hide the application's dock icon."""
+        info = NSBundle.mainBundle().infoDictionary()
+        info["LSUIElement"] = "1"
+        NSProcessInfo.processInfo().environment()
+
+    def setup_app(self) -> None:
         """Set up the application, including hiding the dock icon and initializing the menu."""
         self.hide_dock_icon()
         self.setup_delegate()
         self.setup_timer()
         self.setup_menu()
 
-    def hide_dock_icon(self):
-        """Hide the application's dock icon."""
-        info = NSBundle.mainBundle().infoDictionary()
-        info["LSUIElement"] = "1"
-        NSProcessInfo.processInfo().environment()
-
-    def setup_delegate(self):
+    def setup_delegate(self) -> None:
         """Set up the application delegate."""
         self.nsapp = NSApplication.sharedApplication()
-        delegate = AppDelegate.alloc().init()
-        self.nsapp.setDelegate_(delegate)
+        self.nsapp.setDelegate_(application_supports_secure_restorable_state)
 
-    def setup_timer(self):
+    def setup_timer(self) -> None:
         """Set up the timer for checking audio status."""
         self.check_audio_timer: rumps.Timer = rumps.Timer(self.check_audio, DELAY_WHEN_START)
         self.check_audio_timer.start()
 
-    def setup_menu(self):
+    def setup_menu(self) -> None:
         """Set up the application menu."""
         self.app.menu = [
             rumps.MenuItem("Recent Activity", callback=self.show_recent_activity),
@@ -76,19 +95,20 @@ class SpotifyAutopause:
     # Ignore List Management
     # ----------------------
 
-    def load_ignore_apps(self):
+    @staticmethod
+    def load_ignore_apps() -> List[str]:
         """Load the list of ignored apps from the JSON file."""
         if os.path.exists(IGNORE_LIST_FILE):
             with open(IGNORE_LIST_FILE, 'r') as f:
                 return json.load(f)
         return []
 
-    def save_ignore_apps(self):
+    def save_ignore_apps(self) -> None:
         """Save the list of ignored apps to the JSON file."""
         with open(IGNORE_LIST_FILE, 'w') as f:
             json.dump(self.user_ignore_apps, f)
 
-    def edit_ignore_apps(self, _):
+    def edit_ignore_apps(self, _) -> None:
         """Display a window for editing the list of ignored apps."""
         current_apps = ", ".join(self.user_ignore_apps)
         response = rumps.Window(
@@ -107,12 +127,12 @@ class SpotifyAutopause:
     # Recent Activity Logging
     # -----------------------
 
-    def show_recent_activity(self, _):
+    def show_recent_activity(self, _) -> None:
         """Write the current status table to a log file and open it."""
         self.write_log_file()
         subprocess.run(['open', LOG_FILE])
 
-    def write_log_file(self):
+    def write_log_file(self) -> None:
         """Write the current status table to the log file."""
         with open(LOG_FILE, 'w') as f:
             f.write(self.status_table)
@@ -120,7 +140,7 @@ class SpotifyAutopause:
     # Audio Status Checking and Handling
     # ----------------------------------
 
-    def check_audio(self, sender=None) -> None:
+    def check_audio(self, _) -> None:
         """
         Check the current audio status and handle any changes.
         This method is called periodically by the timer.
@@ -169,23 +189,34 @@ class SpotifyAutopause:
     # Spotify Control
     # ---------------
 
-    def is_spotify_playing(self) -> bool:
-        """Check if Spotify is currently playing music."""
-        code, result, error = osascript.run(SPOTIFY_PLAYER_STATE_SCRIPT)
-        return result.strip() == 'playing'
-
-    def pause_spotify(self) -> None:
+    @staticmethod
+    def is_spotify_running() -> bool:
+        for process in psutil.process_iter(['name']):
+            if process.info['name'] == 'Spotify':
+                return True
+        return False
+    
+    @staticmethod
+    def pause_spotify() -> None:
         """Pause Spotify playback."""
         osascript.run(SPOTIFY_PAUSE_SCRIPT)
 
-    def play_spotify(self) -> None:
+    @staticmethod
+    def play_spotify() -> None:
         """Resume Spotify playback."""
         osascript.run(SPOTIFY_PLAY_SCRIPT)
+
+    def is_spotify_playing(self) -> bool:
+        if self.is_spotify_running():
+            code, result, error = osascript.run(SPOTIFY_PLAYER_STATE_SCRIPT)
+            return result.strip() == 'playing'
+        return False
 
     # Audio Process Detection
     # -----------------------
 
-    def get_audio_pids(self) -> list:
+    @staticmethod
+    def get_audio_pids() -> List[str]:
         """
         Get the process IDs of applications currently using audio output.
         This method parses the output of 'pmset -g assertions' to find audio-related processes.
@@ -201,7 +232,8 @@ class SpotifyAutopause:
                     pids.append(match.group(1))
         return pids
 
-    def list_audio_processes(self, audio_pids: list) -> list:
+    @staticmethod
+    def list_audio_processes(audio_pids: list) -> List[str]:
         """Get the names of processes associated with the given process IDs."""
         processes = []
         for pid in audio_pids:
@@ -209,7 +241,7 @@ class SpotifyAutopause:
             processes.append(process_info.title())
         return processes
 
-    def is_audio_playing(self) -> tuple:
+    def is_audio_playing(self) -> Tuple[bool, List[str]]:
         """
         Check if any non-ignored applications are playing audio.
         Returns a tuple: (is_playing, list_of_playing_apps)
@@ -228,7 +260,7 @@ class SpotifyAutopause:
     # Logging
     # -------
 
-    def log_audio_status(self, spotify_status: bool, other_audio_playing: bool, sources: list, action: str = None) -> None:
+    def log_audio_status(self, spotify_status: bool, other_audio_playing: bool, sources: list, action: str = "") -> None:
         """
         Log the current audio status if there's been a change or an action.
         This method updates the all_rows deque with new status information.
@@ -249,7 +281,7 @@ class SpotifyAutopause:
     # Application Control
     # -------------------
 
-    def quit_app(self, sender) -> None:
+    def quit_app(self) -> None:
         """Quit the application."""
         rumps.quit_application()
 
