@@ -94,7 +94,7 @@ You can modify the following constants in the `spotify-autopause.py` file to adj
 
 If you encounter any issues:
 
-1. Check the terminal output any error messages.
+1. Check the terminal output and note any error messages.
 2. Verify that the application has the necessary permissions to control Spotify and monitor system audio.
 3. Check the "Recent Activity" log and consider adding items from "Other Audio" to the "Ignored Apps" list. Apps that you may not want to affect Spotify's play state could be interfering.
 
