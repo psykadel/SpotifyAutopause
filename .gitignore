@@ -1,7 +1,2 @@
-.venv/
-build/
-dmg/
-dist/
-Spotify Autopause.spec
 .DS_Store
-.env
+build/

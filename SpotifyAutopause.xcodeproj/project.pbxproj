@@ -1,0 +1,533 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A00000000000000000000030 /* SpotifyAutopauseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000020 /* SpotifyAutopauseApp.swift */; };
+		A00000000000000000000031 /* SpotifyAutopauseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000021 /* SpotifyAutopauseViewModel.swift */; };
+		A00000000000000000000032 /* MonitoringConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000022 /* MonitoringConfiguration.swift */; };
+		A00000000000000000000033 /* MonitoringModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000023 /* MonitoringModels.swift */; };
+		A00000000000000000000034 /* PmsetAudioAssertionParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000024 /* PmsetAudioAssertionParser.swift */; };
+		A00000000000000000000035 /* AudioSourceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000025 /* AudioSourceMonitor.swift */; };
+		A00000000000000000000036 /* MonitoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000026 /* MonitoringEngine.swift */; };
+		A00000000000000000000037 /* AppStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000027 /* AppStateStore.swift */; };
+		A00000000000000000000038 /* MenuBarContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000028 /* MenuBarContentView.swift */; };
+		A00000000000000000000039 /* ActivityHistoryWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000029 /* ActivityHistoryWindowView.swift */; };
+		A0000000000000000000003A /* IgnoredAppsWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000002A /* IgnoredAppsWindowView.swift */; };
+		A0000000000000000000003E /* MenuBarIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000002E /* MenuBarIconView.swift */; };
+		A00000000000000000000045 /* PollInspectionWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000046 /* PollInspectionWindowView.swift */; };
+		A00000000000000000000041 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000042 /* AppIcon.icns */; };
+		A0000000000000000000003B /* PmsetAudioAssertionParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000002C /* PmsetAudioAssertionParserTests.swift */; };
+		A0000000000000000000003C /* MonitoringEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000002D /* MonitoringEngineTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A00000000000000000000013 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A00000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A00000000000000000000009;
+			remoteInfo = SpotifyAutopause;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A0000000000000000000000A /* Spotify Autopause.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spotify Autopause.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0000000000000000000000F /* SpotifyAutopauseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpotifyAutopauseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000020 /* SpotifyAutopauseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyAutopauseApp.swift; sourceTree = "<group>"; };
+		A00000000000000000000021 /* SpotifyAutopauseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyAutopauseViewModel.swift; sourceTree = "<group>"; };
+		A00000000000000000000022 /* MonitoringConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitoringConfiguration.swift; sourceTree = "<group>"; };
+		A00000000000000000000023 /* MonitoringModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitoringModels.swift; sourceTree = "<group>"; };
+		A00000000000000000000024 /* PmsetAudioAssertionParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PmsetAudioAssertionParser.swift; sourceTree = "<group>"; };
+		A00000000000000000000025 /* AudioSourceMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSourceMonitor.swift; sourceTree = "<group>"; };
+		A00000000000000000000026 /* MonitoringEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitoringEngine.swift; sourceTree = "<group>"; };
+		A00000000000000000000027 /* AppStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateStore.swift; sourceTree = "<group>"; };
+		A00000000000000000000028 /* MenuBarContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentView.swift; sourceTree = "<group>"; };
+		A00000000000000000000029 /* ActivityHistoryWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityHistoryWindowView.swift; sourceTree = "<group>"; };
+		A0000000000000000000002A /* IgnoredAppsWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoredAppsWindowView.swift; sourceTree = "<group>"; };
+		A0000000000000000000002E /* MenuBarIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarIconView.swift; sourceTree = "<group>"; };
+		A00000000000000000000046 /* PollInspectionWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollInspectionWindowView.swift; sourceTree = "<group>"; };
+		A00000000000000000000042 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
+		A0000000000000000000002C /* PmsetAudioAssertionParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PmsetAudioAssertionParserTests.swift; sourceTree = "<group>"; };
+		A0000000000000000000002D /* MonitoringEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitoringEngineTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A0000000000000000000000C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A00000000000000000000011 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A00000000000000000000044 /* Sanitize Test Bundle */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(WRAPPER_NAME)",
+			);
+			name = "Sanitize Test Bundle";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/SpotifyAutopauseTestsSanitized",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "BUNDLE_PATH=\"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\"\nSTAMP_PATH=\"${DERIVED_FILE_DIR}/SpotifyAutopauseTestsSanitized\"\nif [ -d \"$BUNDLE_PATH\" ]; then\n    /usr/bin/xattr -cr \"$BUNDLE_PATH\" || true\n    /usr/bin/find \"$BUNDLE_PATH\" -name .DS_Store -delete || true\nfi\ntouch \"$STAMP_PATH\"\n";
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A00000000000000000000002 = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000004 /* SpotifyAutopause */,
+				A00000000000000000000008 /* SpotifyAutopauseTests */,
+				A00000000000000000000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A00000000000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A0000000000000000000000A /* Spotify Autopause.app */,
+				A0000000000000000000000F /* SpotifyAutopauseTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000004 /* SpotifyAutopause */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000020 /* SpotifyAutopauseApp.swift */,
+				A00000000000000000000021 /* SpotifyAutopauseViewModel.swift */,
+				A00000000000000000000005 /* Models */,
+				A00000000000000000000006 /* Services */,
+				A00000000000000000000007 /* Views */,
+				A00000000000000000000040 /* Resources */,
+			);
+			path = SpotifyAutopause;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000005 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000022 /* MonitoringConfiguration.swift */,
+				A00000000000000000000023 /* MonitoringModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000006 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000024 /* PmsetAudioAssertionParser.swift */,
+				A00000000000000000000025 /* AudioSourceMonitor.swift */,
+				A00000000000000000000026 /* MonitoringEngine.swift */,
+				A00000000000000000000027 /* AppStateStore.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000007 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000028 /* MenuBarContentView.swift */,
+				A00000000000000000000029 /* ActivityHistoryWindowView.swift */,
+				A0000000000000000000002A /* IgnoredAppsWindowView.swift */,
+				A0000000000000000000002E /* MenuBarIconView.swift */,
+				A00000000000000000000046 /* PollInspectionWindowView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000040 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000042 /* AppIcon.icns */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000008 /* SpotifyAutopauseTests */ = {
+			isa = PBXGroup;
+			children = (
+				A0000000000000000000002C /* PmsetAudioAssertionParserTests.swift */,
+				A0000000000000000000002D /* MonitoringEngineTests.swift */,
+			);
+			path = SpotifyAutopauseTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A00000000000000000000009 /* SpotifyAutopause */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A00000000000000000000017 /* Build configuration list for PBXNativeTarget "SpotifyAutopause" */;
+			buildPhases = (
+				A0000000000000000000000B /* Sources */,
+				A0000000000000000000000C /* Frameworks */,
+				A0000000000000000000000D /* Resources */,
+				A00000000000000000000043 /* Stamp Finder Icon */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SpotifyAutopause;
+			productName = SpotifyAutopause;
+			productReference = A0000000000000000000000A /* Spotify Autopause.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A0000000000000000000000E /* SpotifyAutopauseTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A0000000000000000000001A /* Build configuration list for PBXNativeTarget "SpotifyAutopauseTests" */;
+			buildPhases = (
+				A00000000000000000000010 /* Sources */,
+				A00000000000000000000011 /* Frameworks */,
+				A00000000000000000000044 /* Sanitize Test Bundle */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A00000000000000000000012 /* PBXTargetDependency */,
+			);
+			name = SpotifyAutopauseTests;
+			productName = SpotifyAutopauseTests;
+			productReference = A0000000000000000000000F /* SpotifyAutopauseTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A00000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2630;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					A00000000000000000000009 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					A0000000000000000000000E = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = A00000000000000000000009;
+					};
+				};
+			};
+			buildConfigurationList = A00000000000000000000014 /* Build configuration list for PBXProject "SpotifyAutopause" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A00000000000000000000002;
+			productRefGroup = A00000000000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A00000000000000000000009 /* SpotifyAutopause */,
+				A0000000000000000000000E /* SpotifyAutopauseTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A0000000000000000000000D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000041 /* AppIcon.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A0000000000000000000000B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000030 /* SpotifyAutopauseApp.swift in Sources */,
+				A00000000000000000000031 /* SpotifyAutopauseViewModel.swift in Sources */,
+				A00000000000000000000032 /* MonitoringConfiguration.swift in Sources */,
+				A00000000000000000000033 /* MonitoringModels.swift in Sources */,
+				A00000000000000000000034 /* PmsetAudioAssertionParser.swift in Sources */,
+				A00000000000000000000035 /* AudioSourceMonitor.swift in Sources */,
+				A00000000000000000000036 /* MonitoringEngine.swift in Sources */,
+				A00000000000000000000037 /* AppStateStore.swift in Sources */,
+				A00000000000000000000038 /* MenuBarContentView.swift in Sources */,
+				A00000000000000000000039 /* ActivityHistoryWindowView.swift in Sources */,
+				A0000000000000000000003A /* IgnoredAppsWindowView.swift in Sources */,
+				A0000000000000000000003E /* MenuBarIconView.swift in Sources */,
+				A00000000000000000000045 /* PollInspectionWindowView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A00000000000000000000010 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0000000000000000000003B /* PmsetAudioAssertionParserTests.swift in Sources */,
+				A0000000000000000000003C /* MonitoringEngineTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A00000000000000000000043 /* Stamp Finder Icon */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(WRAPPER_NAME)/Contents/Resources/AppIcon.icns",
+			);
+			name = "Stamp Finder Icon";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/SpotifyAutopauseIconStamped",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "APP_PATH=\"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\"\nICON_PATH=\"${APP_PATH}/Contents/Resources/AppIcon.icns\"\nSTAMP_PATH=\"${DERIVED_FILE_DIR}/SpotifyAutopauseIconStamped\"\nif [ -f \"$ICON_PATH\" ]; then\n    /usr/bin/xattr -cr \"$APP_PATH\" || true\n    /bin/rm -f \"$APP_PATH/$(printf 'Icon\\r')\"\nfi\ntouch \"$STAMP_PATH\"\n";
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A00000000000000000000012 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A00000000000000000000009 /* SpotifyAutopause */;
+			targetProxy = A00000000000000000000013 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A00000000000000000000015 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+			};
+			name = Debug;
+		};
+		A00000000000000000000016 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		A00000000000000000000018 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGNING_REQUIRED = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SpotifyAutopause/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.psykadel.spotifyautopause;
+				PRODUCT_MODULE_NAME = SpotifyAutopause;
+				PRODUCT_NAME = "Spotify Autopause";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A00000000000000000000019 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGNING_REQUIRED = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SpotifyAutopause/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.psykadel.spotifyautopause;
+				PRODUCT_MODULE_NAME = SpotifyAutopause;
+				PRODUCT_NAME = "Spotify Autopause";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A0000000000000000000001B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGNING_REQUIRED = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/../Frameworks",
+					"@loader_path/../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.psykadel.spotifyautopause.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Spotify Autopause.app/Contents/MacOS/Spotify Autopause";
+				TEST_TARGET_NAME = SpotifyAutopause;
+			};
+			name = Debug;
+		};
+		A0000000000000000000001C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGNING_REQUIRED = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/../Frameworks",
+					"@loader_path/../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.psykadel.spotifyautopause.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A00000000000000000000014 /* Build configuration list for PBXProject "SpotifyAutopause" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000000015 /* Debug */,
+				A00000000000000000000016 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A00000000000000000000017 /* Build configuration list for PBXNativeTarget "SpotifyAutopause" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000000018 /* Debug */,
+				A00000000000000000000019 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A0000000000000000000001A /* Build configuration list for PBXNativeTarget "SpotifyAutopauseTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A0000000000000000000001B /* Debug */,
+				A0000000000000000000001C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A00000000000000000000001 /* Project object */;
+}
