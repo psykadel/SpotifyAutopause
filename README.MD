@@ -4,16 +4,16 @@ Spotify Autopause is a native macOS menu bar app that pauses Spotify when other 
 
 ## Highlights
 
-- Native `MenuBarExtra(.window)` macOS app built with SwiftUI and AppKit
-- Spotify control via AppleScript, with the existing pause/resume intent preserved
-- Audio-source detection based on `pmset -g assertions`, resolved into app identities when possible
-- Live Recent Activity window with structured history
+- Native macOS app built with SwiftUI and AppKit
+- Spotify control via AppleScript
+- Audio-source detection based on `pmset -g assertions`, followed by per-PID Core Audio audibility checks
+- Live Recent Activity window
 - Ignored Apps manager with persistent checkboxes, last-seen timestamps, seen counts, and recent-trigger context
 - Local-only state stored in `~/Library/Application Support/Spotify Autopause/state.json`
 
 ## Requirements
 
-- macOS 14 or later
+- macOS 14.2 or later
 - Xcode 26 or later for local builds
 - Spotify desktop app installed
 
@@ -33,17 +33,22 @@ The build script creates:
 Spotify Autopause works entirely on-device, but macOS may prompt for:
 
 - Automation access to control Spotify with Apple Events
-- Permission to observe the system audio state indirectly through the macOS command-line tools it uses
+- System audio capture permission so the app can verify whether a candidate process is actually audible
 
-If Spotify is running but the app does not pause or resume it, check **System Settings > Privacy & Security > Automation** and confirm Spotify Autopause is allowed to control Spotify.
+If Spotify is running but the app does not pause or resume it, check:
+
+- **System Settings > Privacy & Security > Automation** and confirm Spotify Autopause is allowed to control Spotify
+- **System Settings > Privacy & Security > System Audio Recording** and confirm Spotify Autopause is allowed to capture brief audio samples for audibility checks
 
 ## How It Works
 
 1. Spotify Autopause polls the current system audio assertions.
-2. Any active audio source is resolved to a bundle identifier or executable path when possible.
-3. Sources marked as ignored stay visible in the UI but do not trigger a Spotify pause or resume.
-4. If actionable audio starts while Spotify is playing, Spotify Autopause pauses it.
-5. If that actionable audio ends and Spotify Autopause was the component that paused Spotify, it resumes playback.
+2. Candidate PIDs are resolved to app identities when possible.
+3. Only those candidate PIDs are attached to lightweight Core Audio process taps.
+4. A source counts as active only when recent captured samples are above the silence threshold.
+5. Sources marked as ignored stay visible in the UI but do not trigger a Spotify pause or resume.
+6. If actionable audible audio starts while Spotify is playing, Spotify Autopause pauses it.
+7. If that actionable audible audio ends and Spotify Autopause was the component that paused Spotify, it resumes playback.
 
 ## License
 

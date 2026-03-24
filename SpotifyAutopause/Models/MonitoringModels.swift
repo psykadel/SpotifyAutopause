@@ -216,6 +216,7 @@ struct ActivityRecord: Identifiable, Codable, Hashable, Sendable {
 struct MonitoringSnapshot: Equatable, Sendable {
     var spotifyState: SpotifyPlayerState
     var externalAudioActive: Bool
+    var candidateAudioActive: Bool
     var activeSources: [ObservedAudioSource]
     var actionableSources: [ObservedAudioSource]
     var ignoredSources: [ObservedAudioSource]
@@ -257,6 +258,7 @@ struct MonitoringSnapshot: Equatable, Sendable {
     static let empty = MonitoringSnapshot(
         spotifyState: .notRunning,
         externalAudioActive: false,
+        candidateAudioActive: false,
         activeSources: [],
         actionableSources: [],
         ignoredSources: [],
@@ -270,10 +272,12 @@ struct PersistedAppState: Codable, Sendable {
     var activityRecords: [ActivityRecord]
     var observedSources: [ObservedAudioSource]
     var ignoredEntries: [IgnoredAppEntry]
+    var monitoringConfiguration: MonitoringConfiguration?
 
     static let empty = PersistedAppState(
         activityRecords: [],
         observedSources: [],
-        ignoredEntries: []
+        ignoredEntries: [],
+        monitoringConfiguration: nil
     )
 }

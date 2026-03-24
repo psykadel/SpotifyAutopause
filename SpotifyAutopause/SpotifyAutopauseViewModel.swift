@@ -8,13 +8,13 @@ final class SpotifyAutopauseViewModel: ObservableObject {
     @Published private(set) var pollInspectionSnapshot: PollInspectionSnapshot?
     @Published private(set) var pollInspectionErrorMessage: String?
     @Published private(set) var isRefreshingPollInspection = false
-
-    let configuration: MonitoringConfiguration
+    @Published private(set) var configuration: MonitoringConfiguration
 
     private let audioSourceMonitor: AudioSourceMonitor
     private let spotifyController: any SpotifyControlling
     private let activityStore: ActivityStore
     private let ignoredAppsStore: IgnoredAppsStore
+    private let configurationStore: MonitoringConfigurationStore
 
     private var monitoringEngine = MonitoringEngine()
     private var monitoringTask: Task<Void, Never>?
@@ -26,11 +26,12 @@ final class SpotifyAutopauseViewModel: ObservableObject {
         spotifyController: any SpotifyControlling = SpotifyController(),
         appStateStore: AppStateStore = AppStateStore()
     ) {
-        self.configuration = configuration
+        self._configuration = Published(initialValue: configuration)
         self.audioSourceMonitor = audioSourceMonitor
         self.spotifyController = spotifyController
         self.activityStore = ActivityStore(appStateStore: appStateStore, historyLimit: configuration.storedHistoryLimit)
         self.ignoredAppsStore = IgnoredAppsStore(appStateStore: appStateStore)
+        self.configurationStore = MonitoringConfigurationStore(appStateStore: appStateStore)
     }
 
     deinit {
@@ -160,6 +161,7 @@ final class SpotifyAutopauseViewModel: ObservableObject {
     }
 
     private func loadPersistedState() async {
+        configuration = await configurationStore.load()
         activityRecords = await activityStore.load()
         observedSources = await ignoredAppsStore.load()
         snapshot.lastAction = activityRecords.first
@@ -169,30 +171,35 @@ final class SpotifyAutopauseViewModel: ObservableObject {
         let now = Date()
         let spotifyStateBefore = await readSpotifyState()
 
-        let activeSources: [ObservedAudioSource]
+        let observation: AudioSourceObservation
         do {
-            activeSources = try await audioSourceMonitor.fetchActiveSources(at: now)
-            snapshot.lastErrorMessage = nil
+            observation = try await audioSourceMonitor.fetchActiveSources(at: now)
         } catch {
-            snapshot.lastErrorMessage = error.localizedDescription
-            let errorRecord = ActivityRecord(
-                action: .monitorError,
-                sourceIDs: [],
-                sourceDisplayNames: [],
-                visibleSourceIDs: [],
-                visibleSourceDisplayNames: [],
-                spotifyStateBefore: spotifyStateBefore,
-                spotifyStateAfter: spotifyStateBefore,
-                ignored: false,
-                note: error.localizedDescription
-            )
-            activityRecords = await activityStore.append([errorRecord])
-            snapshot.lastAction = activityRecords.first
+            let errorMessage = error.localizedDescription
+            if snapshot.lastErrorMessage != errorMessage {
+                let errorRecord = makeMonitorErrorRecord(
+                    message: errorMessage,
+                    sources: [],
+                    visibleSources: [],
+                    spotifyBefore: spotifyStateBefore,
+                    spotifyAfter: spotifyStateBefore
+                )
+                activityRecords = await activityStore.append([errorRecord])
+                snapshot.lastAction = activityRecords.first
+            }
+
             snapshot.lastUpdatedAt = now
             snapshot.spotifyState = spotifyStateBefore
+            snapshot.externalAudioActive = false
+            snapshot.candidateAudioActive = false
+            snapshot.activeSources = []
+            snapshot.actionableSources = []
+            snapshot.ignoredSources = []
+            snapshot.lastErrorMessage = errorMessage
             return
         }
 
+        let activeSources = observation.activeSources
         let ignoredSourceIDs = Set(observedSources.filter(\.isIgnored).map(\.id))
         let outcome = monitoringEngine.evaluate(
             spotifyState: spotifyStateBefore,
@@ -203,10 +210,26 @@ final class SpotifyAutopauseViewModel: ObservableObject {
         var spotifyStateAfter = spotifyStateBefore
         var activity: [ActivityRecord] = []
         var sourceActions: [String: ActivityAction] = [:]
+        let previousStatusMessage = snapshot.lastErrorMessage
+        var statusMessage = observation.warningMessage
+        var recordedMonitorMessages = Set<String>()
 
         let decoratedCurrentSources = applyingPersistedIgnoreFlags(to: activeSources, using: observedSources)
         let currentActionableSources = decoratedCurrentSources.filter { !$0.isEffectivelyIgnored }
         let currentIgnoredSources = decoratedCurrentSources.filter(\.isEffectivelyIgnored)
+
+        if let warningMessage = observation.warningMessage, warningMessage != previousStatusMessage {
+            activity.append(
+                makeMonitorErrorRecord(
+                    message: warningMessage,
+                    sources: monitorErrorSources(from: observation.probeDiagnostics),
+                    visibleSources: [],
+                    spotifyBefore: spotifyStateBefore,
+                    spotifyAfter: spotifyStateBefore
+                )
+            )
+            recordedMonitorMessages.insert(warningMessage)
+        }
 
         for event in outcome.events {
             switch event {
@@ -295,20 +318,19 @@ final class SpotifyAutopauseViewModel: ObservableObject {
                 sourceActions.merge(commandSources.reduce(into: [:]) { $0[$1.id] = commandAction }) { _, new in new }
             } catch {
                 monitoringEngine.commandFailed(command)
-                snapshot.lastErrorMessage = error.localizedDescription
-                activity.append(
-                    ActivityRecord(
-                        action: .monitorError,
-                        sourceIDs: commandSources.map(\.id),
-                        sourceDisplayNames: commandSources.map(\.displayName),
-                        visibleSourceIDs: commandVisibleSources.map(\.id),
-                        visibleSourceDisplayNames: commandVisibleSources.map(\.displayName),
-                        spotifyStateBefore: spotifyStateBefore,
-                        spotifyStateAfter: spotifyStateBefore,
-                        ignored: false,
-                        note: error.localizedDescription
+                statusMessage = error.localizedDescription
+                if statusMessage != previousStatusMessage, let statusMessage, !recordedMonitorMessages.contains(statusMessage) {
+                    activity.append(
+                        makeMonitorErrorRecord(
+                            message: statusMessage,
+                            sources: commandSources,
+                            visibleSources: commandVisibleSources,
+                            spotifyBefore: spotifyStateBefore,
+                            spotifyAfter: spotifyStateBefore
+                        )
                     )
-                )
+                    recordedMonitorMessages.insert(statusMessage)
+                }
             }
         }
 
@@ -324,12 +346,13 @@ final class SpotifyAutopauseViewModel: ObservableObject {
         snapshot = MonitoringSnapshot(
             spotifyState: spotifyStateAfter,
             externalAudioActive: !refreshedActionableSources.isEmpty,
+            candidateAudioActive: observation.hasCandidateProcesses,
             activeSources: refreshedSources,
             actionableSources: refreshedActionableSources,
             ignoredSources: refreshedIgnoredSources,
             lastAction: activityRecords.first ?? snapshot.lastAction,
             lastUpdatedAt: now,
-            lastErrorMessage: snapshot.lastErrorMessage
+            lastErrorMessage: statusMessage
         )
 
         lastActionableSources = refreshedActionableSources
@@ -369,6 +392,7 @@ final class SpotifyAutopauseViewModel: ObservableObject {
         return MonitoringSnapshot(
             spotifyState: spotifyState,
             externalAudioActive: !actionableSources.isEmpty,
+            candidateAudioActive: snapshot.candidateAudioActive,
             activeSources: activeSources,
             actionableSources: actionableSources,
             ignoredSources: ignoredSources,
@@ -407,21 +431,84 @@ final class SpotifyAutopauseViewModel: ObservableObject {
         }
     }
 
+    func updateConfiguration(_ updatedConfiguration: MonitoringConfiguration) {
+        Task { [weak self] in
+            guard let self else {
+                return
+            }
+
+            self.configuration = await self.configurationStore.save(updatedConfiguration)
+        }
+    }
+
+    func resetConfigurationToDefaults() {
+        updateConfiguration(.default)
+    }
+
     private var pollDelay: Duration {
         monitoringPollDelay(
             configuration: configuration,
             externalAudioActive: snapshot.externalAudioActive,
+            candidateAudioActive: snapshot.candidateAudioActive,
             waitingToResumeSpotify: monitoringEngine.shouldResumeSpotify
         )
+    }
+
+    private func makeMonitorErrorRecord(
+        message: String,
+        sources: [ObservedAudioSource],
+        visibleSources: [ObservedAudioSource],
+        spotifyBefore: SpotifyPlayerState,
+        spotifyAfter: SpotifyPlayerState
+    ) -> ActivityRecord {
+        ActivityRecord(
+            action: .monitorError,
+            sourceIDs: sources.map(\.id),
+            sourceDisplayNames: sources.map(\.displayName),
+            visibleSourceIDs: visibleSources.map(\.id),
+            visibleSourceDisplayNames: visibleSources.map(\.displayName),
+            spotifyStateBefore: spotifyBefore,
+            spotifyStateAfter: spotifyAfter,
+            ignored: false,
+            note: message
+        )
+    }
+
+    private func monitorErrorSources(from diagnostics: [ProbeInspectionResult]) -> [ObservedAudioSource] {
+        var orderedSources: [ObservedAudioSource] = []
+        var seenSourceIDs: Set<String> = []
+
+        for diagnostic in diagnostics {
+            guard seenSourceIDs.insert(diagnostic.sourceID).inserted else {
+                continue
+            }
+
+            orderedSources.append(
+                ObservedAudioSource(
+                    id: diagnostic.sourceID,
+                    displayName: diagnostic.displayName,
+                    bundleIdentifier: nil,
+                    executablePath: nil,
+                    lastSeenAt: Date(),
+                    lastTriggeredAt: nil,
+                    lastTriggeredAction: nil,
+                    seenCount: 0,
+                    isIgnored: false
+                )
+            )
+        }
+
+        return orderedSources
     }
 }
 
 func monitoringPollDelay(
     configuration: MonitoringConfiguration,
     externalAudioActive: Bool,
+    candidateAudioActive: Bool,
     waitingToResumeSpotify: Bool
 ) -> Duration {
-    if waitingToResumeSpotify {
+    if waitingToResumeSpotify || candidateAudioActive {
         return .milliseconds(configuration.resumeWatchPollIntervalMilliseconds)
     }
 

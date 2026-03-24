@@ -21,9 +21,11 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>14.0</string>
+	<string>14.2</string>
 	<key>LSUIElement</key>
 	<true/>
+	<key>NSAudioCaptureUsageDescription</key>
+	<string>Spotify Autopause captures brief process audio samples to confirm when other apps are actually audible.</string>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Spotify Autopause controls Spotify playback when other apps start or stop audio.</string>
 	<key>NSPrincipalClass</key>

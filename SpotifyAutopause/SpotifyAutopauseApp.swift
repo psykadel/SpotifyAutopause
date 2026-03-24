@@ -4,6 +4,7 @@ enum SpotifyAutopauseWindowID {
     static let recentActivity = "recent-activity"
     static let ignoredApps = "ignored-apps"
     static let inspect = "inspect"
+    static let configure = "configure"
 }
 
 @main
@@ -47,6 +48,13 @@ struct SpotifyAutopauseApp: App {
                 .environmentObject(viewModel)
         }
         .defaultSize(width: 860, height: 620)
+        .windowResizability(.contentSize)
+
+        Window("Configure", id: SpotifyAutopauseWindowID.configure) {
+            ConfigurationWindowView()
+                .environmentObject(viewModel)
+        }
+        .defaultSize(width: 560, height: 420)
         .windowResizability(.contentSize)
     }
 }

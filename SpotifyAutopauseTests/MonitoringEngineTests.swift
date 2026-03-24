@@ -74,6 +74,7 @@ final class MonitoringEngineTests: XCTestCase {
         let spotifyOnly = MonitoringSnapshot(
             spotifyState: .playing,
             externalAudioActive: false,
+            candidateAudioActive: false,
             activeSources: [spotify],
             actionableSources: [],
             ignoredSources: [spotify],
@@ -90,6 +91,7 @@ final class MonitoringEngineTests: XCTestCase {
         let ignoredSafari = MonitoringSnapshot(
             spotifyState: .paused,
             externalAudioActive: false,
+            candidateAudioActive: false,
             activeSources: [spotify, safari],
             actionableSources: [],
             ignoredSources: [spotify, safari],
@@ -250,6 +252,7 @@ final class MonitoringEngineTests: XCTestCase {
         let delay = monitoringPollDelay(
             configuration: configuration,
             externalAudioActive: true,
+            candidateAudioActive: false,
             waitingToResumeSpotify: true
         )
 
@@ -266,6 +269,7 @@ final class MonitoringEngineTests: XCTestCase {
         let delay = monitoringPollDelay(
             configuration: configuration,
             externalAudioActive: true,
+            candidateAudioActive: false,
             waitingToResumeSpotify: false
         )
 
@@ -282,10 +286,28 @@ final class MonitoringEngineTests: XCTestCase {
         let delay = monitoringPollDelay(
             configuration: configuration,
             externalAudioActive: false,
+            candidateAudioActive: false,
             waitingToResumeSpotify: false
         )
 
         XCTAssertEqual(delay, .seconds(3))
+    }
+
+    func testMonitoringPollDelayUsesResumeWatchWhileCandidateAudioIsBeingProbed() {
+        let configuration = MonitoringConfiguration(
+            activePollIntervalSeconds: 2,
+            idlePollIntervalSeconds: 3,
+            resumeWatchPollIntervalMilliseconds: 750
+        )
+
+        let delay = monitoringPollDelay(
+            configuration: configuration,
+            externalAudioActive: false,
+            candidateAudioActive: true,
+            waitingToResumeSpotify: false
+        )
+
+        XCTAssertEqual(delay, .milliseconds(750))
     }
 
     func testPersistedIgnoreFlagsAndHistoryRoundTrip() async throws {
@@ -342,7 +364,23 @@ final class MonitoringEngineTests: XCTestCase {
                 stderr: ""
             )
         ])
-        let monitor = AudioSourceMonitor(runner: runner)
+        let probe = MockAudibilityProbe(observationProvider: { candidates in
+            AudibilityProbeObservation(
+                audiblePIDs: [321],
+                warningMessage: nil,
+                diagnostics: candidates.map {
+                    ProbeInspectionResult(
+                        pid: $0.pid,
+                        displayName: $0.source.displayName,
+                        sourceID: $0.source.id,
+                        state: .audible,
+                        peakLevel: 0.05,
+                        detail: "Mock audible."
+                    )
+                }
+            )
+        })
+        let monitor = AudioSourceMonitor(runner: runner, audibilityProbe: probe)
 
         let snapshot = try await monitor.inspectPollingCommands(at: Date(timeIntervalSince1970: 100))
 
@@ -353,6 +391,8 @@ final class MonitoringEngineTests: XCTestCase {
         XCTAssertEqual(snapshot.entries[0].result.status, 0)
         XCTAssertTrue(snapshot.entries[0].result.stdout.contains("Audio-Playing"))
         XCTAssertEqual(snapshot.entries[1].result.stdout, "/Applications/Firefox.app/Contents/MacOS/firefox\n")
+        XCTAssertEqual(snapshot.probeDiagnostics.map(\.pid), [321])
+        XCTAssertEqual(snapshot.probeDiagnostics.map(\.state), [.audible])
     }
 
     func testInspectPollingCommandsReturnsPmsetFailureWithoutPsEntries() async throws {
@@ -363,7 +403,7 @@ final class MonitoringEngineTests: XCTestCase {
                 stderr: "pmset failed"
             )
         ])
-        let monitor = AudioSourceMonitor(runner: runner)
+        let monitor = AudioSourceMonitor(runner: runner, audibilityProbe: MockAudibilityProbe(observation: .init(audiblePIDs: [], warningMessage: nil, diagnostics: [])))
 
         let snapshot = try await monitor.inspectPollingCommands(at: Date(timeIntervalSince1970: 100))
 
@@ -371,6 +411,114 @@ final class MonitoringEngineTests: XCTestCase {
         XCTAssertEqual(snapshot.entries[0].commandLine, "/usr/bin/pmset -g assertions")
         XCTAssertEqual(snapshot.entries[0].result.status, 1)
         XCTAssertEqual(snapshot.entries[0].result.stderr, "pmset failed")
+        XCTAssertEqual(snapshot.probeDiagnostics, [])
+    }
+
+    func testFetchActiveSourcesMergesMultipleAudibleCandidatesIntoSingleAppLevelSource() async throws {
+        let runner = MockShellCommandRunner(resultsByInvocation: [
+            .init(executable: "/usr/bin/pmset", arguments: ["-g", "assertions"]): .init(
+                status: 0,
+                stdout: """
+                2026-03-23 18:00:00 -0500
+                Assertion status system-wide:
+                Listed by owning process:
+                  pid 111(Firefox): [0x1] 00:00:10 PreventUserIdleDisplaySleep named: "Created for PID: 111"
+                     Details: Resources: audio-out
+                  pid 222(Firefox): [0x2] 00:00:10 PreventUserIdleDisplaySleep named: "Created for PID: 222"
+                     Details: Resources: audio-out
+                """,
+                stderr: ""
+            ),
+            .init(executable: "/bin/ps", arguments: ["-p", "111", "-o", "command="]): .init(
+                status: 0,
+                stdout: "/Applications/Firefox.app/Contents/MacOS/firefox\n",
+                stderr: ""
+            ),
+            .init(executable: "/bin/ps", arguments: ["-p", "222", "-o", "command="]): .init(
+                status: 0,
+                stdout: "/Applications/Firefox.app/Contents/MacOS/firefox\n",
+                stderr: ""
+            )
+        ])
+        let probe = MockAudibilityProbe(observationProvider: { candidates in
+            AudibilityProbeObservation(
+                audiblePIDs: [111],
+                warningMessage: nil,
+                diagnostics: candidates.map {
+                    ProbeInspectionResult(
+                        pid: $0.pid,
+                        displayName: $0.source.displayName,
+                        sourceID: $0.source.id,
+                        state: $0.pid == 111 ? .audible : .silent,
+                        peakLevel: $0.pid == 111 ? 0.02 : 0,
+                        detail: $0.pid == 111 ? "Audible." : "Silent."
+                    )
+                }
+            )
+        })
+        let monitor = AudioSourceMonitor(runner: runner, audibilityProbe: probe)
+
+        let observation = try await monitor.fetchActiveSources(at: Date(timeIntervalSince1970: 100))
+
+        XCTAssertTrue(observation.hasCandidateProcesses)
+        XCTAssertEqual(observation.activeSources.map(\.displayName), ["firefox"])
+        XCTAssertEqual(observation.probeDiagnostics.map(\.state), [.audible, .silent])
+    }
+
+    func testFetchActiveSourcesReturnsWarningAndNoActionableAudioWhenProbePermissionIsDenied() async throws {
+        let runner = MockShellCommandRunner(resultsByInvocation: [
+            .init(executable: "/usr/bin/pmset", arguments: ["-g", "assertions"]): .init(
+                status: 0,
+                stdout: """
+                2026-03-23 18:00:00 -0500
+                Assertion status system-wide:
+                Listed by owning process:
+                  pid 321(Firefox): [0x1] 00:00:10 PreventUserIdleDisplaySleep named: "Created for PID: 321"
+                     Details: Resources: audio-out
+                """,
+                stderr: ""
+            ),
+            .init(executable: "/bin/ps", arguments: ["-p", "321", "-o", "command="]): .init(
+                status: 0,
+                stdout: "/Applications/Firefox.app/Contents/MacOS/firefox\n",
+                stderr: ""
+            )
+        ])
+        let warning = "System audio capture permission is required to confirm whether external audio is audible."
+        let probe = MockAudibilityProbe(observationProvider: { candidates in
+            AudibilityProbeObservation(
+                audiblePIDs: [],
+                warningMessage: warning,
+                diagnostics: candidates.map {
+                    ProbeInspectionResult(
+                        pid: $0.pid,
+                        displayName: $0.source.displayName,
+                        sourceID: $0.source.id,
+                        state: .permissionRequired,
+                        peakLevel: nil,
+                        detail: "Permission required."
+                    )
+                }
+            )
+        })
+        let monitor = AudioSourceMonitor(runner: runner, audibilityProbe: probe)
+
+        let observation = try await monitor.fetchActiveSources(at: Date(timeIntervalSince1970: 100))
+
+        XCTAssertTrue(observation.hasCandidateProcesses)
+        XCTAssertEqual(observation.activeSources, [])
+        XCTAssertEqual(observation.warningMessage, warning)
+        XCTAssertEqual(observation.probeDiagnostics.map(\.state), [.permissionRequired])
+    }
+
+    func testPeakWindowAudibilityStateKeepsAudioAudibleThroughHoldWindowAndRequiresTwoQuietWindowsToClear() {
+        var state = PeakWindowAudibilityState()
+        let start = Date(timeIntervalSince1970: 100)
+
+        XCTAssertTrue(state.record(peak: 0.02, at: start))
+        XCTAssertTrue(state.record(peak: 0, at: start.addingTimeInterval(0.1)))
+        XCTAssertTrue(state.record(peak: 0, at: start.addingTimeInterval(0.35)))
+        XCTAssertFalse(state.record(peak: 0, at: start.addingTimeInterval(0.7)))
     }
 
     func testClearingActivityAndResettingIgnoredAppsPersistsFreshState() async throws {
@@ -478,5 +626,21 @@ private actor MockShellCommandRunner: ShellCommandRunning {
         }
 
         return result
+    }
+}
+
+private actor MockAudibilityProbe: AudibilityProbing {
+    private let observationProvider: @Sendable ([CandidateAudioProcess]) -> AudibilityProbeObservation
+
+    init(observation: AudibilityProbeObservation) {
+        self.observationProvider = { _ in observation }
+    }
+
+    init(observationProvider: @escaping @Sendable ([CandidateAudioProcess]) -> AudibilityProbeObservation) {
+        self.observationProvider = observationProvider
+    }
+
+    func observe(_ candidates: [CandidateAudioProcess], at now: Date) async -> AudibilityProbeObservation {
+        observationProvider(candidates)
     }
 }

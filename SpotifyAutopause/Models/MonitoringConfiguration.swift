@@ -1,6 +1,6 @@
 import Foundation
 
-struct MonitoringConfiguration: Equatable, Sendable {
+struct MonitoringConfiguration: Codable, Equatable, Sendable {
     static let defaultStartupDelaySeconds = 2
     static let defaultActivePollIntervalSeconds = 2
     static let defaultIdlePollIntervalSeconds = 3

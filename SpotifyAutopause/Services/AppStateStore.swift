@@ -36,6 +36,10 @@ actor AppStateStore {
         Self.sortedSources(state.observedSources)
     }
 
+    func monitoringConfiguration() -> MonitoringConfiguration {
+        state.monitoringConfiguration ?? .default
+    }
+
     func appendActivityRecords(_ records: [ActivityRecord], limit: Int) throws -> [ActivityRecord] {
         guard !records.isEmpty else {
             return activityRecords()
@@ -120,6 +124,12 @@ actor AppStateStore {
         return observedSources()
     }
 
+    func setMonitoringConfiguration(_ configuration: MonitoringConfiguration) throws -> MonitoringConfiguration {
+        state.monitoringConfiguration = configuration
+        try persist()
+        return monitoringConfiguration()
+    }
+
     private func syncIgnoredEntries() {
         state.ignoredEntries = state.observedSources
             .filter(\.isIgnored)
@@ -188,6 +198,26 @@ actor ActivityStore {
             return try await appStateStore.clearActivityRecords()
         } catch {
             return await appStateStore.activityRecords()
+        }
+    }
+}
+
+actor MonitoringConfigurationStore {
+    private let appStateStore: AppStateStore
+
+    init(appStateStore: AppStateStore) {
+        self.appStateStore = appStateStore
+    }
+
+    func load() async -> MonitoringConfiguration {
+        await appStateStore.monitoringConfiguration()
+    }
+
+    func save(_ configuration: MonitoringConfiguration) async -> MonitoringConfiguration {
+        do {
+            return try await appStateStore.setMonitoringConfiguration(configuration)
+        } catch {
+            return await appStateStore.monitoringConfiguration()
         }
     }
 }

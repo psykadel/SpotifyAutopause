@@ -103,18 +103,27 @@ struct MenuBarContentView: View {
                     NSApp.activate(ignoringOtherApps: true)
                 }
                 .buttonStyle(.bordered)
+
+                Button("Inspect") {
+                    openWindow(id: SpotifyAutopauseWindowID.inspect)
+                    NSApp.activate(ignoringOtherApps: true)
+                }
+                .buttonStyle(.bordered)
             }
 
-            Button("Inspect") {
-                openWindow(id: SpotifyAutopauseWindowID.inspect)
-                NSApp.activate(ignoringOtherApps: true)
-            }
-            .buttonStyle(.bordered)
+            HStack(spacing: 8) {
+                Button("Configure") {
+                    openWindow(id: SpotifyAutopauseWindowID.configure)
+                    NSApp.activate(ignoringOtherApps: true)
+                }
+                .buttonStyle(.bordered)
 
-            Button("Quit Spotify Autopause") {
-                NSApp.terminate(nil)
+                Button("Quit") {
+                    NSApp.terminate(nil)
+                }
+                .keyboardShortcut("q", modifiers: .command)
+                .buttonStyle(.bordered)
             }
-            .keyboardShortcut("q", modifiers: .command)
         }
     }
 
@@ -178,4 +187,130 @@ struct MenuBarContentView: View {
         formatter.timeStyle = .medium
         return formatter
     }()
+}
+
+struct ConfigurationWindowView: View {
+    @EnvironmentObject private var viewModel: SpotifyAutopauseViewModel
+
+    @State private var draftConfiguration = MonitoringConfiguration.default
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Configure")
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                Text("Adjust how often Spotify Autopause checks for other audio and how much recent activity it keeps visible.")
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Form {
+                Section("Checking Timing") {
+                    Stepper(value: binding(\.startupDelaySeconds, save: saveSecondsConfiguration), in: 0...15) {
+                        labeledSetting(
+                            title: "Startup delay",
+                            value: "\(draftConfiguration.startupDelaySeconds) sec"
+                        )
+                    }
+
+                    Stepper(value: binding(\.activePollIntervalSeconds, save: saveSecondsConfiguration), in: 1...10) {
+                        labeledSetting(
+                            title: "When other audio is active",
+                            value: "\(draftConfiguration.activePollIntervalSeconds) sec"
+                        )
+                    }
+
+                    Stepper(value: binding(\.idlePollIntervalSeconds, save: saveSecondsConfiguration), in: 1...15) {
+                        labeledSetting(
+                            title: "When everything is quiet",
+                            value: "\(draftConfiguration.idlePollIntervalSeconds) sec"
+                        )
+                    }
+
+                    Stepper(value: binding(\.resumeWatchPollIntervalMilliseconds, save: saveMillisecondsConfiguration), in: 250...3000, step: 250) {
+                        labeledSetting(
+                            title: "While confirming audibility",
+                            value: "\(draftConfiguration.resumeWatchPollIntervalMilliseconds) ms"
+                        )
+                    }
+                }
+
+                Section("Recent Activity") {
+                    Stepper(value: binding(\.visibleHistoryLimit, save: saveVisibleHistoryConfiguration), in: 10...100, step: 5) {
+                        labeledSetting(
+                            title: "Rows shown in Recent Activity",
+                            value: "\(draftConfiguration.visibleHistoryLimit)"
+                        )
+                    }
+                }
+            }
+            .formStyle(.grouped)
+
+            HStack {
+                Spacer(minLength: 0)
+
+                Button("Defaults") {
+                    draftConfiguration = .default
+                    viewModel.resetConfigurationToDefaults()
+                }
+                .buttonStyle(.bordered)
+            }
+        }
+        .padding(20)
+        .frame(minWidth: 520, minHeight: 360, alignment: .topLeading)
+        .onAppear {
+            draftConfiguration = viewModel.configuration
+        }
+        .onChange(of: viewModel.configuration) { _, updatedConfiguration in
+            draftConfiguration = updatedConfiguration
+        }
+    }
+
+    private func labeledSetting(title: String, value: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+            Spacer(minLength: 0)
+            Text(value)
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func binding(
+        _ keyPath: WritableKeyPath<MonitoringConfiguration, Int>,
+        save: @escaping (MonitoringConfiguration) -> Void
+    ) -> Binding<Int> {
+        Binding(
+            get: {
+                draftConfiguration[keyPath: keyPath]
+            },
+            set: { newValue in
+                draftConfiguration[keyPath: keyPath] = newValue
+                save(draftConfiguration)
+            }
+        )
+    }
+
+    private func saveSecondsConfiguration(_ configuration: MonitoringConfiguration) {
+        viewModel.updateConfiguration(
+            MonitoringConfiguration(
+                startupDelaySeconds: configuration.startupDelaySeconds,
+                activePollIntervalSeconds: configuration.activePollIntervalSeconds,
+                idlePollIntervalSeconds: configuration.idlePollIntervalSeconds,
+                resumeWatchPollIntervalMilliseconds: configuration.resumeWatchPollIntervalMilliseconds,
+                visibleHistoryLimit: configuration.visibleHistoryLimit,
+                storedHistoryLimit: viewModel.configuration.storedHistoryLimit
+            )
+        )
+    }
+
+    private func saveMillisecondsConfiguration(_ configuration: MonitoringConfiguration) {
+        saveSecondsConfiguration(configuration)
+    }
+
+    private func saveVisibleHistoryConfiguration(_ configuration: MonitoringConfiguration) {
+        saveSecondsConfiguration(configuration)
+    }
 }
