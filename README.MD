@@ -1,54 +1,62 @@
 # Spotify Autopause
 
-Spotify Autopause is a native macOS menu bar app that pauses Spotify when other apps start playing audio, then resumes Spotify when that audio stops.
+Spotify Autopause is a small menu bar app for Mac that pauses Spotify when another app starts making sound, then resumes Spotify when that sound stops.
 
-## Highlights
+It is useful if you listen to Spotify while watching videos, taking calls, or opening apps that suddenly start playing audio.
 
-- Native macOS app built with SwiftUI and AppKit
-- Spotify control via AppleScript
-- Audio-source detection based on `pmset -g assertions`, followed by per-PID Core Audio audibility checks
-- Live Recent Activity window
-- Ignored Apps manager with persistent checkboxes, last-seen timestamps, seen counts, and recent-trigger context
-- Local-only state stored in `~/Library/Application Support/Spotify Autopause/state.json`
+## What It Does
 
-## Requirements
+- Lives in your menu bar
+- Watches for other audible apps
+- Pauses Spotify automatically when needed
+- Resumes Spotify when the interruption is over
+- Lets you ignore apps you never want to trigger a pause
+- Shows a simple recent activity log so you can see what happened
 
-- macOS 14.2 or later
-- Xcode 26 or later for local builds
-- Spotify desktop app installed
+## What You Need
 
-## Build
+- A Mac running macOS 14.2 or later
+- The Spotify desktop app installed
+
+## Permissions
+
+The app runs locally on your Mac, but macOS may ask for permission to:
+
+- control Spotify
+- check whether another app is actually producing audible sound
+
+If Spotify does not pause or resume correctly, open:
+
+- `System Settings > Privacy & Security > Automation`
+- `System Settings > Privacy & Security > System Audio Recording`
+
+and make sure Spotify Autopause is allowed.
+
+## How To Use It
+
+1. Open Spotify Autopause.
+2. Leave it running in the menu bar.
+3. Play music in Spotify.
+4. Open another app that plays sound.
+5. Spotify Autopause will pause Spotify and bring it back when the sound ends.
+
+If there is an app you do not want to count, open `Ignored Apps` and add it to the ignore list.
+
+## Download A Release
+
+If you do not want to build the app yourself, you can download a prebuilt release from the repository's GitHub Releases section.
+
+## Build From Source
 
 ```bash
 ./build.sh
 ```
 
-The build script creates:
+This creates the app and a DMG in the `build` folder.
 
-- `build/DerivedData/Build/Products/Release/Spotify Autopause.app`
-- `build/Artifacts/SpotifyAutopause.dmg`
+## Privacy
 
-## Permissions
-
-Spotify Autopause works entirely on-device, but macOS may prompt for:
-
-- Automation access to control Spotify with Apple Events
-- System audio capture permission so the app can verify whether a candidate process is actually audible
-
-If Spotify is running but the app does not pause or resume it, check:
-
-- **System Settings > Privacy & Security > Automation** and confirm Spotify Autopause is allowed to control Spotify
-- **System Settings > Privacy & Security > System Audio Recording** and confirm Spotify Autopause is allowed to capture brief audio samples for audibility checks
-
-## How It Works
-
-1. Spotify Autopause polls the current system audio assertions.
-2. Candidate PIDs are resolved to app identities when possible.
-3. Only those candidate PIDs are attached to lightweight Core Audio process taps.
-4. A source counts as active only when recent captured samples are above the silence threshold.
-5. Sources marked as ignored stay visible in the UI but do not trigger a Spotify pause or resume.
-6. If actionable audible audio starts while Spotify is playing, Spotify Autopause pauses it.
-7. If that actionable audible audio ends and Spotify Autopause was the component that paused Spotify, it resumes playback.
+Spotify Autopause keeps its data on your Mac. It does not need a cloud service to work.
 
 ## License
 
