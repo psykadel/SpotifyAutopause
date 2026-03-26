@@ -41,19 +41,6 @@ struct ActivityHistoryWindowView: View {
                             .truncationMode(.tail)
                     }
                     .width(min: 180, ideal: 210)
-
-                    TableColumn("Spotify") { record in
-                        Text(record.spotifyTransitionSummary)
-                            .font(.system(size: 12, weight: .medium, design: .rounded))
-                    }
-                    .width(min: 118, ideal: 132)
-
-                    TableColumn("State") { record in
-                        Text(record.ignored ? "Ignored" : "")
-                            .font(.system(size: 12, weight: .semibold, design: .rounded))
-                            .foregroundStyle(record.ignored ? .secondary : .primary)
-                    }
-                    .width(min: 82, ideal: 92)
                 }
                 .tableStyle(.inset(alternatesRowBackgrounds: true))
             }

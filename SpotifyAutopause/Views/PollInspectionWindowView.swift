@@ -159,7 +159,7 @@ struct PollInspectionWindowView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("\(diagnostic.displayName) (PID \(diagnostic.pid))")
+                    Text("\(diagnostic.userFacingDisplayName) (PID \(diagnostic.pid))")
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
                     Text(diagnostic.sourceID)
                         .font(.system(size: 11, weight: .medium, design: .monospaced))

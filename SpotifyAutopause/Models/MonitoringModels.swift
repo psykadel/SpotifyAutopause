@@ -1,5 +1,13 @@
 import Foundation
 
+func userFacingAudioSourceName(_ name: String) -> String {
+    if name.caseInsensitiveCompare("systemsoundserverd") == .orderedSame {
+        return "System Audio"
+    }
+
+    return name
+}
+
 enum SpotifyPlayerState: String, Codable, CaseIterable, Sendable {
     case notRunning
     case playing
@@ -91,6 +99,10 @@ struct ObservedAudioSource: Identifiable, Codable, Hashable, Sendable {
         isIgnored || isAlwaysIgnored
     }
 
+    var userFacingDisplayName: String {
+        userFacingAudioSourceName(displayName)
+    }
+
     var detailLine: String {
         if let bundleIdentifier, !bundleIdentifier.isEmpty {
             return bundleIdentifier
@@ -156,12 +168,12 @@ struct ActivityRecord: Identifiable, Codable, Hashable, Sendable {
             return "No source details"
         }
 
-        return sourceDisplayNames.joined(separator: ", ")
+        return sourceDisplayNames.map(userFacingAudioSourceName).joined(separator: ", ")
     }
 
     var visibleSourceSummary: String {
         if hasExplicitVisibleSources {
-            return visibleSourceDisplayNames?.joined(separator: ", ") ?? sourceSummary
+            return visibleSourceDisplayNames?.map(userFacingAudioSourceName).joined(separator: ", ") ?? sourceSummary
         }
 
         switch action {
@@ -221,7 +233,6 @@ struct MonitoringSnapshot: Equatable, Sendable {
     var actionableSources: [ObservedAudioSource]
     var ignoredSources: [ObservedAudioSource]
     var lastAction: ActivityRecord?
-    var lastUpdatedAt: Date?
     var lastErrorMessage: String?
 
     var userVisibleActiveSources: [ObservedAudioSource] {
@@ -234,7 +245,7 @@ struct MonitoringSnapshot: Equatable, Sendable {
 
     var currentAudioSummary: String {
         if !actionableSources.isEmpty {
-            return actionableSources.map(\.displayName).joined(separator: ", ")
+            return actionableSources.map(\.userFacingDisplayName).joined(separator: ", ")
         }
 
         if !userVisibleIgnoredSources.isEmpty {
@@ -263,7 +274,6 @@ struct MonitoringSnapshot: Equatable, Sendable {
         actionableSources: [],
         ignoredSources: [],
         lastAction: nil,
-        lastUpdatedAt: nil,
         lastErrorMessage: nil
     )
 }

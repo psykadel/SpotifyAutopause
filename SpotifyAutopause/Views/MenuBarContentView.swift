@@ -67,7 +67,7 @@ struct MenuBarContentView: View {
             if !viewModel.snapshot.userVisibleIgnoredSources.isEmpty {
                 infoBlock(
                     title: "Ignored Right Now",
-                    value: viewModel.snapshot.userVisibleIgnoredSources.map(\.displayName).joined(separator: ", "),
+                    value: viewModel.snapshot.userVisibleIgnoredSources.map(\.userFacingDisplayName).joined(separator: ", "),
                     secondary: "Ignored sources stay visible here but do not pause Spotify."
                 )
             }
@@ -75,11 +75,6 @@ struct MenuBarContentView: View {
             infoBlock(
                 title: "Last Action",
                 value: viewModel.snapshot.lastAction?.action.title ?? "Waiting for activity"
-            )
-
-            infoBlock(
-                title: "Updated",
-                value: formattedTimestamp(viewModel.snapshot.lastUpdatedAt)
             )
         }
         .padding(14)
@@ -173,20 +168,6 @@ struct MenuBarContentView: View {
         }
     }
 
-    private func formattedTimestamp(_ date: Date?) -> String {
-        guard let date else {
-            return "Not yet"
-        }
-
-        return Self.timestampFormatter.string(from: date)
-    }
-
-    private static let timestampFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .medium
-        return formatter
-    }()
 }
 
 struct ConfigurationWindowView: View {
@@ -206,14 +187,7 @@ struct ConfigurationWindowView: View {
             }
 
             Form {
-                Section("Checking Timing") {
-                    Stepper(value: binding(\.startupDelaySeconds, save: saveSecondsConfiguration), in: 0...15) {
-                        labeledSetting(
-                            title: "Startup delay",
-                            value: "\(draftConfiguration.startupDelaySeconds) sec"
-                        )
-                    }
-
+                Section("Check Frequency") {
                     Stepper(value: binding(\.activePollIntervalSeconds, save: saveSecondsConfiguration), in: 1...10) {
                         labeledSetting(
                             title: "When other audio is active",
@@ -230,7 +204,7 @@ struct ConfigurationWindowView: View {
 
                     Stepper(value: binding(\.resumeWatchPollIntervalMilliseconds, save: saveMillisecondsConfiguration), in: 250...3000, step: 250) {
                         labeledSetting(
-                            title: "While confirming audibility",
+                            title: "Monitoring active for audible sound",
                             value: "\(draftConfiguration.resumeWatchPollIntervalMilliseconds) ms"
                         )
                     }
@@ -296,7 +270,6 @@ struct ConfigurationWindowView: View {
     private func saveSecondsConfiguration(_ configuration: MonitoringConfiguration) {
         viewModel.updateConfiguration(
             MonitoringConfiguration(
-                startupDelaySeconds: configuration.startupDelaySeconds,
                 activePollIntervalSeconds: configuration.activePollIntervalSeconds,
                 idlePollIntervalSeconds: configuration.idlePollIntervalSeconds,
                 resumeWatchPollIntervalMilliseconds: configuration.resumeWatchPollIntervalMilliseconds,

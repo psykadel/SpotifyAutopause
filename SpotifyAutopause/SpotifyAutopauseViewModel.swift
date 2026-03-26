@@ -74,10 +74,6 @@ final class SpotifyAutopauseViewModel: ObservableObject {
 
             await self.loadPersistedState()
 
-            if self.configuration.startupDelaySeconds > 0 {
-                try? await Task.sleep(for: .seconds(self.configuration.startupDelaySeconds))
-            }
-
             while !Task.isCancelled {
                 await self.pollOnce()
                 try? await Task.sleep(for: self.pollDelay)
@@ -188,7 +184,6 @@ final class SpotifyAutopauseViewModel: ObservableObject {
                 snapshot.lastAction = activityRecords.first
             }
 
-            snapshot.lastUpdatedAt = now
             snapshot.spotifyState = spotifyStateBefore
             snapshot.externalAudioActive = false
             snapshot.candidateAudioActive = false
@@ -351,7 +346,6 @@ final class SpotifyAutopauseViewModel: ObservableObject {
             actionableSources: refreshedActionableSources,
             ignoredSources: refreshedIgnoredSources,
             lastAction: activityRecords.first ?? snapshot.lastAction,
-            lastUpdatedAt: now,
             lastErrorMessage: statusMessage
         )
 
@@ -397,7 +391,6 @@ final class SpotifyAutopauseViewModel: ObservableObject {
             actionableSources: actionableSources,
             ignoredSources: ignoredSources,
             lastAction: snapshot.lastAction,
-            lastUpdatedAt: snapshot.lastUpdatedAt,
             lastErrorMessage: snapshot.lastErrorMessage
         )
     }

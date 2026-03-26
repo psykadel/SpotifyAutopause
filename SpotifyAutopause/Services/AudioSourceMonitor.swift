@@ -59,6 +59,10 @@ struct ProbeInspectionResult: Identifiable, Equatable, Sendable {
     var id: String {
         "pid:\(pid)"
     }
+
+    var userFacingDisplayName: String {
+        userFacingAudioSourceName(displayName)
+    }
 }
 
 struct PollInspectionSnapshot: Sendable {
@@ -327,7 +331,11 @@ struct ProcessResolver: Sendable {
 
     private static func normalizedDisplayName(_ rawName: String) -> String {
         let trimmed = rawName.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? "Unknown Source" : trimmed
+        guard !trimmed.isEmpty else {
+            return "Unknown Source"
+        }
+
+        return trimmed
     }
 
     private static func stableID(bundleIdentifier: String?, executablePath: String?, fallbackName: String) -> String {

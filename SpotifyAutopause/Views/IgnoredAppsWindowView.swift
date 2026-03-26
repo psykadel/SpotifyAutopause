@@ -23,7 +23,7 @@ struct IgnoredAppsWindowView: View {
             }
         }
         .padding(20)
-        .frame(minWidth: 940, minHeight: 540)
+        .frame(minWidth: 760, minHeight: 540)
         .confirmationDialog(
             "Reset ignored apps?",
             isPresented: $showingResetConfirmation,
@@ -79,7 +79,7 @@ struct IgnoredAppsWindowView: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .frame(width: 420, alignment: .topLeading)
     }
 
     private var savedColumn: some View {
@@ -126,7 +126,7 @@ private struct CandidateSourceRow: View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(source.displayName)
+                    Text(source.userFacingDisplayName)
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
                 }
 
@@ -188,7 +188,7 @@ private struct SavedIgnoredRow: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Text(source.displayName)
+            Text(source.userFacingDisplayName)
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                 .lineLimit(1)
                 .truncationMode(.tail)
